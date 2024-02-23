@@ -33,7 +33,7 @@ public class BookingManager {
 		return false; // room not found
 	}
 
-	public void addBooking(BookingDetail bookingDetail) {
+	public void addBooking(BookingDetail bookingDetail) throws Exception {
 		for (Room room : rooms) {
 			if (room.getRoomNumber().equals(bookingDetail.getRoomNumber())) {
                 if (isRoomAvailable(bookingDetail.getRoomNumber(), bookingDetail.getDate())) {
