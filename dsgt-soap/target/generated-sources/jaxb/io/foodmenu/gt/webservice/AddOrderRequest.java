@@ -87,4 +87,13 @@ public class AddOrderRequest {
         this.quantity = value;
     }
 
+    public Order getOrder() {
+        Order order = new Order();
+        // generate unique id
+        order.setId(java.util.UUID.randomUUID().toString());
+        order.setMeal(meal);
+        order.setQuantity(quantity);
+        return order;
+    }
+
 }

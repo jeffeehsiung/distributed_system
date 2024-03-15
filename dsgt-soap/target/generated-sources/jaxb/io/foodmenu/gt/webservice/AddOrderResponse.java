@@ -14,6 +14,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import com.example.springsoap.OrderConfirmation;
+
 
 /**
  * <p>Java class for anonymous complex type.
@@ -43,6 +45,7 @@ public class AddOrderResponse {
 
     @XmlElement(required = true)
     protected Order order;
+    protected OrderConfirmation confirmation;
 
     /**
      * Gets the value of the order property.
@@ -66,6 +69,11 @@ public class AddOrderResponse {
      */
     public void setOrder(Order value) {
         this.order = value;
+    }
+
+    public void setConfirmation(OrderConfirmation order2) {
+        // set the confirmation
+        this.confirmation = order2;
     }
 
 }

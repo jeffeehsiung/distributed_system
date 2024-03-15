@@ -80,6 +80,11 @@ public class MealRepository {
     public OrderConfirmation addOrder(Order order) {
         Assert.notNull(order, "The order must not be null");
         meals.put(order.getMeal().getName(), order.getMeal());
+        // create a order confirmation
+        OrderConfirmation orderConfirmation = new OrderConfirmation();
+        orderConfirmation.setOrder(order);
+        orderConfirmation.setConfirmation("Order confirmed for " + order.getMeal().getName());
+        return orderConfirmation;
     }
 
 
