@@ -3,12 +3,8 @@
     <soapenv:Header/>
     <soapenv:Body>
         <gs:addOrderRequest>
-            <gs:order>
-                <gs:meal>
-                    <gs:mealId>?</gs:mealId>
-                    <gs:quantity>?</gs:quantity>
-                </gs:meal>
-            </gs:order>
+            <gs:name>Portobello</gs:name>
+            <gs:quantity>2</gs:quantity>
         </gs:addOrderRequest>
     </soapenv:Body>
 </soapenv:Envelope>
