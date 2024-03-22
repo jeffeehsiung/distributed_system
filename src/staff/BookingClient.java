@@ -7,13 +7,12 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import hotel.BookingDetail;
-import hotel.BookingManager;
 import hotel.BookingManagerInterface;
 import hotel.IBookingSession;
 
 public class BookingClient extends AbstractScriptedSimpleTest {
 
-	private BookingManager bm = null;
+	private BookingManagerInterface bm = null;
 	private final static LocalDate today = LocalDate.now();
 
 	public static void main(String[] args) {
@@ -93,12 +92,19 @@ public class BookingClient extends AbstractScriptedSimpleTest {
 	/***************
 	 * CONSTRUCTOR *
 	 ***************/
-	public BookingClient() {
+	public BookingClient(String[] args) {
 		try {
-            // Assuming BookingManager is already acting as a local instance for simplicity
-            // In a real RMI setup, you would look up the remote instance here
-			bm = new BookingManager();
+			int port = 8082; // 默认的 RMI 注册表端口号
+			String host = (args.length<1)?null:args[0];
+			//Look up the registered remote instance
+			if (args.length >= 2) {
+				port = Integer.parseInt(args[1]); // 如果命令行参数中提供了第二个参数，则使用它作为端口号
+			}
+			// 获取 RMI 注册表，并指定主机名和端口号
+			Registry registry = LocateRegistry.getRegistry(host, port);
+			bm = (BookingManagerInterface) registry.lookup("BookingManager");
 		} catch (Exception exp) {
+			System.err.println("Client Exception: "+ exp.toString());
 			exp.printStackTrace();
 		}
 	}
@@ -122,7 +128,7 @@ public class BookingClient extends AbstractScriptedSimpleTest {
 	}
 
 	@Override
-	public Set<Integer> getAllRooms() {
+	public Set<Integer> getAllRooms() throws RemoteException {
 		return bm.getAllRooms();
 	}
 }

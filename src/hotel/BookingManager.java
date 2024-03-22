@@ -7,11 +7,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 // This class is the server-side implementation of the BookingManagerInterface interface.
-import java.rmi.server.UnicastRemoteObject;
 import java.rmi.RemoteException;
 
 
-public class BookingManager extends UnicastRemoteObject implements BookingManagerInterface {
+public class BookingManager implements BookingManagerInterface {
 
 	private Room[] rooms;
 	// private final Object lock = new Object();
@@ -23,12 +22,6 @@ public class BookingManager extends UnicastRemoteObject implements BookingManage
 
 	@Override
 	public Set<Integer> getAllRooms() {
-		// Set<Integer> allRooms = new HashSet<Integer>();
-		// Iterable<Room> roomIterator = Arrays.asList(rooms);
-		// for (Room room : roomIterator) {
-		// 	allRooms.add(room.getRoomNumber());
-		// }
-		// return allRooms;
 		return Arrays.stream(rooms).map(Room::getRoomNumber).collect(Collectors.toSet());
 	}
 
