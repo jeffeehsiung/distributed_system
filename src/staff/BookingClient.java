@@ -17,9 +17,10 @@ public class BookingClient extends AbstractScriptedSimpleTest {
 
 	public static void main(String[] args) {
         try {
-			
+			String host = (args.length < 1) ? "dsjjgi.eastus.cloudapp.azure.com" : args[0];
+			int port = (args.length < 2) ? 8082: Integer.parseInt(args[1]);
             // try connect to the server
-			Registry registry = LocateRegistry.getRegistry("localhost", 1099);
+			Registry registry = LocateRegistry.getRegistry(host, port);
 			BookingManagerInterface bm = (BookingManagerInterface) registry.lookup("BookingManager");
 
             // Simulate multiple clients by creating multiple threads

@@ -17,7 +17,7 @@
 	   The third parameter is filename for the final zip.	   
     ******************************************************** -->
   <property name="main.client" value="staff.BookingClient" />
-  <property name="main.server" value="hotel.BookingServer" />
+  <property name="main.server" value="server.BookingServer" />
   <property name="client.manifest" value="${src}/clientManifest.mf"/>
   <property name="server.manifest" value="${src}/serverManifest.mf"/>
   <property name="zip.filename" value="rmi" />
