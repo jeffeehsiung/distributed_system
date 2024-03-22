@@ -76,6 +76,15 @@ public class MealRepository {
 
     }
 
+    // create new order with meal and quantity
+    public Order createOrder(Meal meal, int quantity) {
+        Assert.notNull(meal, "The meal must not be null");
+        Order order = new Order();
+        order.setMeal(meal);
+        order.setQuantity(quantity);
+        return order;
+    }
+
     // add order
     public OrderConfirmation addOrder(Order order) {
         Assert.notNull(order, "The order must not be null");

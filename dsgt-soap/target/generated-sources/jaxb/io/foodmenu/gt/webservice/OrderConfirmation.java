@@ -11,21 +11,21 @@ package io.foodmenu.gt.webservice;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for orderConfirmation complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType&gt;
+ * &lt;complexType name="orderConfirmation"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="order" type="{http://foodmenu.io/gt/webservice}order"/&gt;
+ *         &lt;element name="confirmation" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -35,37 +35,63 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "name"
+@XmlType(name = "orderConfirmation", propOrder = {
+    "order",
+    "confirmation"
 })
-@XmlRootElement(name = "getMealRequest")
-public class GetMealRequest {
+public class OrderConfirmation {
 
     @XmlElement(required = true)
-    protected String name;
+    protected Order order;
+    @XmlElement(required = true)
+    protected String confirmation;
 
     /**
-     * Gets the value of the name property.
+     * Gets the value of the order property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Order }
+     *     
+     */
+    public Order getOrder() {
+        return order;
+    }
+
+    /**
+     * Sets the value of the order property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Order }
+     *     
+     */
+    public void setOrder(Order value) {
+        this.order = value;
+    }
+
+    /**
+     * Gets the value of the confirmation property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getName() {
-        return name;
+    public String getConfirmation() {
+        return confirmation;
     }
 
     /**
-     * Sets the value of the name property.
+     * Sets the value of the confirmation property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setName(String value) {
-        this.name = value;
+    public void setConfirmation(String value) {
+        this.confirmation = value;
     }
 
 }

@@ -16,7 +16,6 @@ public class MenuEndpoint {
 
     private MealRepository mealrepo;
 
-    @Autowired
     public MenuEndpoint(MealRepository mealrepo) {
         this.mealrepo = mealrepo;
     }
@@ -54,8 +53,7 @@ public class MenuEndpoint {
     @ResponsePayload
     public AddOrderResponse addOrder(@RequestPayload AddOrderRequest request) {
         AddOrderResponse response = new AddOrderResponse();
-        response.setConfirmation(mealrepo.addOrder(request.getOrder()));
-
+        response.setOrderConfirmation(mealrepo.addOrder(mealrepo.createOrder(request.getMeal(), request.getQuantity())));        
         return response;
     }
 

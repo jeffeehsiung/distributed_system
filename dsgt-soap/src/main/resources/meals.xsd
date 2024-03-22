@@ -60,11 +60,11 @@
     <xs:element name="addOrderResponse">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="order" type="tns:order"/>
+                <!-- return order confirmation -->
+                <xs:element name="orderConfirmation" type="tns:orderConfirmation"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
 
     <xs:complexType name="meal">
         <xs:sequence>
@@ -76,8 +76,6 @@
         </xs:sequence>
     </xs:complexType>
 
-
-
     <xs:simpleType name="mealtype">
         <xs:restriction base="xs:string">
             <xs:enumeration value="vegan"/>
@@ -87,14 +85,19 @@
         </xs:restriction>
     </xs:simpleType>
 
-
-
     <xs:complexType name="order">
         <xs:sequence>
             <xs:element name="id" type="xs:string"/>
             <xs:element name="meal" type="tns:meal"/>
             <xs:element name="quantity" type="xs:int"/>
-            <!-- Add other order properties here -->
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- orderconfirmation -->
+    <xs:complexType name="orderConfirmation">
+        <xs:sequence>
+            <xs:element name="order" type="tns:order"/>
+            <xs:element name="confirmation" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
