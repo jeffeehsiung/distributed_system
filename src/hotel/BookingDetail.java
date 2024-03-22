@@ -1,10 +1,10 @@
 package hotel;
 
 import java.time.LocalDate;
+//  serializable is used to convert the object into a byte stream
 import java.io.Serializable;
 
-public class BookingDetail implements Serializable{
-
+public class BookingDetail implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String guest;

@@ -7,10 +7,9 @@ import java.util.Set;
 
 public interface BookingManagerInterface extends Remote {
     boolean isRoomAvailable(Integer roomNumber, LocalDate date) throws RemoteException;
-    void addBooking(BookingDetail bookingDetail) throws RemoteException;
+    void  addBooking(BookingDetail bookingDetail) throws RemoteException;
     Set<Integer> getAvailableRooms(LocalDate date) throws RemoteException;
     Set<Integer> getAllRooms() throws RemoteException;
-    
+
     IBookingSession createBookingSession() throws RemoteException;
 }
-

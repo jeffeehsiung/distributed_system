@@ -1,125 +1,90 @@
 package staff;
 
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import hotel.BookingDetail;
-
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-
 import hotel.BookingManagerInterface;
 import hotel.IBookingSession;
 
 public class BookingClient extends AbstractScriptedSimpleTest {
 
-	// locate the remote BookingManager object in the RMI registry and invoke its methods
 	private BookingManagerInterface bm = null;
+	private final static LocalDate today = LocalDate.now();
 
-	// public static void main(String[] args) throws Exception {
-	// 	BookingClient client = new BookingClient();
-	// 	client.run();
-	// }
+	public static void main(String[] args) {
+        try {
+			String host = (args.length < 1) ? "dsjjgi.eastus.cloudapp.azure.com" : args[0];
+			int port = (args.length < 2) ? 8082: Integer.parseInt(args[1]);
+            // try connect to the server
+			Registry registry = LocateRegistry.getRegistry(host, port);
+			BookingManagerInterface bm = (BookingManagerInterface) registry.lookup("BookingManager");
 
-	 public static void main(String[] args) {
-		Runnable task = () -> {
-			try {
-				BookingClient client = new BookingClient();
-				client.run();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		};
-		Thread client1 = new Thread(task);
-		Thread client2 = new Thread(task);
+            // Simulate multiple clients by creating multiple threads
+            Thread client1 = new Thread(() -> attemptBooking(bm, 101, LocalDate.now()));
+            Thread client2 = new Thread(() -> attemptBooking(bm, 102, today));
 
-		// Start both threads, simulating concurrent clients
-		client1.start();
-		client2.start();
+            // Thread trying to book the same room as client1
+            Thread client3 = new Thread(() -> attemptBooking(bm, 102, today));
+			Thread client4 = new Thread(() -> attemptBooking(bm, 101, today));
 
-		// Wait for both threads to finish
-		try {
-			client1.join();
-			client2.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+			Thread client5 = new Thread(() -> attemptBooking(bm, 201, today));
 
-		try {
-            BookingClient client = new BookingClient();
-            client.testConcurrentBookingDifferentRooms();
-            client.testConcurrentBookingSameRoom();
-            // Test using IBookingSession for transactional bookings
-            client.testSessionBasedBooking();
+			// Test session-based booking
+			Thread client6 = new Thread(() -> {
+				try {
+					testSessionBasedBooking(bm);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
+
+
+            // Start the threads
+            client1.start();
+            client2.start();
+            client3.start();
+			client4.start();
+			client5.start();
+			client6.start();
+
+            client1.join();
+            client2.join();
+            client3.join();
+			client4.join();
+			client5.join();
+			client6.join();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-private void testConcurrentBookingDifferentRooms() throws Exception {
-	System.out.println("Testing concurrent booking for different rooms");
-	ExecutorService executor = Executors.newFixedThreadPool(2);
-	executor.submit(() -> {
-		try {
-			attemptBooking(101, LocalDate.now());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	});
-	executor.submit(() -> {
-		try {
-			attemptBooking(102, LocalDate.now());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	});
-	executor.shutdown();
-}
-
-    private void testConcurrentBookingSameRoom() throws Exception {
-        System.out.println("Testing concurrent booking for the same room");
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        // Both threads attempt to book the same room on the same date
-        executor.submit(() -> {
-			try {
-				attemptBooking(101, LocalDate.now());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
-        executor.submit(() -> {
-			try {
-				attemptBooking(101, LocalDate.now());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
-        executor.shutdown();
-    }
-
-    private void attemptBooking(int roomNumber, LocalDate date) throws Exception{
+    private static void attemptBooking(BookingManagerInterface bm, int roomNumber, LocalDate date) {
         try {
-            if (isRoomAvailable(roomNumber, date)) {
-                System.out.println(Thread.currentThread().getName() + " - Room " + roomNumber + " is available, attempting to book.");
-                addBooking(new BookingDetail("Guest " + Thread.currentThread().getName(), roomNumber, date));
-                System.out.println(Thread.currentThread().getName() + " - Room " + roomNumber + " booked successfully.");
+            if (bm.isRoomAvailable(roomNumber, date)) {
+                bm.addBooking(new BookingDetail("Guest " + roomNumber, roomNumber, date));
+                System.out.println("Booking successful for room " + roomNumber + " for " + date);
             } else {
-                System.out.println(Thread.currentThread().getName() + " - Room " + roomNumber + " is not available.");
+                System.out.println("Room " + roomNumber + " is not available.");
             }
-        } catch (Exception e) {
-            System.out.println(Thread.currentThread().getName() + " - Failed to book room " + roomNumber + ": " + e.getMessage());
+        } catch ( RemoteException e) {
+            System.out.println("Failed to book room " + roomNumber + ": " + e.getMessage());
         }
     }
-
-    private void testSessionBasedBooking() throws Exception {
-        System.out.println("Testing session-based booking");
+    
+	private static void testSessionBasedBooking(BookingManagerInterface bm) throws Exception {
+	    System.out.println("Testing session-based booking");
         IBookingSession session = bm.createBookingSession();
         LocalDate date = LocalDate.now();
-        session.addBookingDetail(new BookingDetail("Alice", 103, date));
-        session.addBookingDetail(new BookingDetail("Bob", 104, date));
+		date = date.plusDays(1);
+        session.addBookingDetail(new BookingDetail("Alice", 102, date));
+        session.addBookingDetail(new BookingDetail("Bob", 203, today));
+		session.addBookingDetail(new BookingDetail("Andy", 201, today));
         try {
             session.bookAll();
             System.out.println("Session-based booking completed successfully.");
@@ -127,43 +92,47 @@ private void testConcurrentBookingDifferentRooms() throws Exception {
             System.out.println("Failed to complete session-based booking: " + e.getMessage());
         }
     }
-
 	/***************
 	 * CONSTRUCTOR *
 	 ***************/
-	public BookingClient() {
+	public BookingClient(String[] args) {
 		try {
-			Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-			bm = (BookingManagerInterface) registry.lookup("BookingManager");
-			if (bm == null) {
-				System.err.println("Failed to lookup BookingManager.");
-				System.exit(1); // Exit or handle the error appropriately
+			int port = 8082; // 默认的 RMI 注册表端口号
+			String host = (args.length<1)?null:args[0];
+			//Look up the registered remote instance
+			if (args.length >= 2) {
+				port = Integer.parseInt(args[1]); // 如果命令行参数中提供了第二个参数，则使用它作为端口号
 			}
+			// 获取 RMI 注册表，并指定主机名和端口号
+			Registry registry = LocateRegistry.getRegistry(host, port);
+			bm = (BookingManagerInterface) registry.lookup("BookingManager");
 		} catch (Exception exp) {
+			System.err.println("Client Exception: "+ exp.toString());
 			exp.printStackTrace();
 			System.exit(1); // Exit or handle the error appropriately
 		}
 	}
 
 	@Override
-	public boolean isRoomAvailable(Integer roomNumber, LocalDate date) throws Exception{
+	public boolean isRoomAvailable(Integer roomNumber, LocalDate date) throws RemoteException{
+		//Implement this method
 		return bm.isRoomAvailable(roomNumber, date);
 	}
 
 	@Override
-	public void addBooking(BookingDetail bookingDetail) throws Exception {
+	public void addBooking(BookingDetail bookingDetail) throws RemoteException {
 		//Implement this method
 		bm.addBooking(bookingDetail);
 	}
 
 	@Override
-	public Set<Integer> getAvailableRooms(LocalDate date) throws Exception{
+	public Set<Integer> getAvailableRooms(LocalDate date) throws RemoteException{
 		//Implement this method
 		return bm.getAvailableRooms(date);
 	}
 
 	@Override
-	public Set<Integer> getAllRooms() throws Exception{
+	public Set<Integer> getAllRooms() throws RemoteException {
 		return bm.getAllRooms();
 	}
 
