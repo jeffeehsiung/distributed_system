@@ -4,8 +4,13 @@
   <property name="src" location="src"/>
   <property name="build" location="bin"/>
   <property name="dist" location="dist"/>
+  <!-- define the path to Jmeter installation -->
+  <property name="jmeter.home" location="/home/jeffee/apache-jmeter-5.6.3"/>
+  <!-- add jmeter jards to classpath -->
   <path id="cp">
 	<pathelement location="${build}"/>
+  <fileset dir="${jmeter.home}/lib" includes="*.jar"/> <!-- Adds all JARs in the lib directory -->
+  <fileset dir="${jmeter.home}/lib/ext" includes="*.jar"/> <!-- Adds all JARs in the lib/ext directory -->
   </path>
 
   <!--
@@ -18,8 +23,10 @@
     ******************************************************** -->
   <property name="main.client" value="staff.BookingClient" />
   <property name="main.server" value="server.BookingServer" />
+  <property name="main.sampler" value="rmi.RMIJavaSampler" />
   <property name="client.manifest" value="${src}/clientManifest.mf"/>
   <property name="server.manifest" value="${src}/serverManifest.mf"/>
+  <property name="sampler.manifest" value="${src}/samplerManifest.mf"/>
   <property name="zip.filename" value="rmi" />
   <!--
     ********************************************************
@@ -33,10 +40,16 @@
     <mkdir dir="${build}"/>
   </target>
 
-  <target name="compile" depends="init">
-    <javac includeantruntime="false" srcdir="${src}" destdir="${build}"/>
+  <target name="compile-sampler" depends="init">
+    <javac includeantruntime="false" srcdir="${src}" destdir="${build}" classpathref="cp">
+      <include name="rmi/**"/>
+    </javac>
   </target>
-  
+
+  <target name="compile" depends="init">
+    <javac includeantruntime="false" srcdir="${src}" destdir="${build}" classpathref="cp"/>
+  </target>
+
   <target name="registry.start">
 	<exec spawn="true" executable="rmiregistry" dir="${build}"/>
 	<sleep milliseconds="5000"/>
@@ -93,30 +106,43 @@
 	********************************************************
 		Jar Packaging
 	******************************************************** -->
+
+  <!-- Package the client code into a JAR -->
   <target name="jar-client" depends="compile">
-  	<jar destfile="${dist}/client.jar" basedir="${build}">
-        <manifest>
-            <attribute name="Main-Class" value="${main.client}"/>
-        </manifest>
-        <fileset dir="${build}" includes="staff/**"/>
-	</jar>
+    <jar destfile="${dist}/client.jar" basedir="${build}">
+      <manifest>
+        <attribute name="Main-Class" value="${main.client}"/>
+      </manifest>
+      <fileset dir="${build}" includes="staff/**"/>
+    </jar>
   </target>
-  
+
   <!-- Package the server code into a JAR -->
   <target name="jar-server" depends="compile">
-	<jar destfile="${dist}/server.jar" basedir="${build}">
-		<manifest>
-			<attribute name="Main-Class" value="${main.server}"/>
-		</manifest>
-		<fileset dir="${build}" includes="hotel/**"/>
-	</jar>
+    <jar destfile="${dist}/server.jar" basedir="${build}">
+      <manifest>
+        <attribute name="Main-Class" value="${main.server}"/>
+      </manifest>
+      <fileset dir="${build}" includes="hotel/**"/>
+    </jar>
   </target>
   
+  <!-- Package the rmi java sampler code into a JAR -->
+  <target name="jar-sampler" depends="compile-sampler">
+    <jar destfile="${dist}/RMIJavaSampler.jar" basedir="${build}">
+      <manifest>
+        <attribute name="Main-Class" value="${main.sampler}"/>
+      </manifest>
+      <fileset dir="${build}" includes="rmi/**"/>
+    </jar>
+  </target>
+
+
   <target name="run.jar" depends="jar-client, jar-server">
   	<echo message="Client and Server jars have been created in ${dist}"/>
   </target>
 
-    <target name="clean">
+  <target name="clean">
 	<delete dir="${build}" quiet="true"/>
 	<delete dir="${dist}" quiet="true"/>
   </target>
