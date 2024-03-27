@@ -2,6 +2,7 @@ package hotel;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,21 +25,35 @@ public class BookingSession extends UnicastRemoteObject implements IBookingSessi
 
     @Override
     public void bookAll() throws RemoteException {
-        // boolean list for rooms booking status
-        List<Boolean> bookingStatus = new ArrayList<>();
-            for (BookingDetail detail : shoppingCart) {
-                if (!bookingManager.isRoomAvailable(detail.getRoomNumber(), detail.getDate())) {
-                    bookingStatus.add(false);
-                }else{
+        List<Integer> unavailableRooms = new ArrayList<>();
+
+        // Check availability for each booking detail
+        for (BookingDetail detail : shoppingCart) {
+            if (!bookingManager.isRoomAvailable(detail.getRoomNumber(), detail.getDate())) {
+                unavailableRooms.add(detail.getRoomNumber());
+            } else {
+                try {
                     bookingManager.addBooking(detail);
-                    bookingStatus.add(true);
+                } catch (RemoteException e) {
+                    // Handle RemoteException for individual bookings
+                    System.err.println("Failed to book room " + detail.getRoomNumber() + ": " + e.getMessage());
                 }
             }
-            // throws the exception of the rooms and print the number of the rooms that are not available
-            if (bookingStatus.contains(false)) {
-                throw new RemoteException("Transaction successful: Room " + shoppingCart.get(bookingStatus.indexOf(true)).getRoomNumber() + " is booked sucessfully on " + shoppingCart.get(bookingStatus.indexOf(false)).getDate() + "\n" + "Transaction failed: Room " + shoppingCart.get(bookingStatus.indexOf(false)).getRoomNumber() + " is not available on " + shoppingCart.get(bookingStatus.indexOf(false)).getDate());
-            }
+        }
 
+        // If any rooms are unavailable, throw RemoteException with a clear error message
+        if (!unavailableRooms.isEmpty()) {
+            int firstUnavailableRoom = unavailableRooms.get(0);
+            LocalDate unavailableDate = shoppingCart.stream()
+                                                    .filter(detail -> detail.getRoomNumber() == firstUnavailableRoom)
+                                                    .findFirst()
+                                                    .map(BookingDetail::getDate)
+                                                    .orElse(null);
+            if (unavailableDate != null) {
+                throw new RemoteException("Transaction failed: Room " + firstUnavailableRoom + " is not available on " + unavailableDate);
+            }
+        }
     }
+
 
 }

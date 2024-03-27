@@ -13,12 +13,12 @@ public class BookingServer {
         try {
             BookingManager manager = new BookingManager();
 
-            // define customized port
-            int communicationPort = 8083;
+            // define the port number
+            int rmiPort = 1099;
             // export the booking manager to the RMI registry and specify the port
-            BookingManagerInterface stub = (BookingManagerInterface) UnicastRemoteObject.exportObject(manager, communicationPort);
+            BookingManagerInterface stub = (BookingManagerInterface) UnicastRemoteObject.exportObject(manager, rmiPort);
             
-            Registry registry = LocateRegistry.createRegistry(8082); // Default RMI port
+            Registry registry = LocateRegistry.createRegistry(rmiPort); // Default RMI port
             registry.bind("BookingManager", stub);
             System.out.println("Booking Manager is ready.");
         } catch (Exception e) {
