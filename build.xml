@@ -127,15 +127,18 @@
     </jar>
   </target>
   
-  <!-- Package the rmi java sampler code into a JAR -->
-  <target name="jar-sampler" depends="compile-sampler">
+  <!-- Package the RMI Java Sampler and BookingClient code into a JAR -->
+  <target name="jar-sampler" depends="compile, compile-sampler">
     <jar destfile="${dist}/RMIJavaSampler.jar" basedir="${build}">
       <manifest>
         <attribute name="Main-Class" value="${main.sampler}"/>
       </manifest>
+      <!-- Include both rmi and staff package classes -->
       <fileset dir="${build}" includes="rmi/**"/>
+      <fileset dir="${build}" includes="staff/**"/>
     </jar>
   </target>
+
 
 
   <target name="run.jar" depends="jar-client, jar-server">
