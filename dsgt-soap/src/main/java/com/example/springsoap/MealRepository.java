@@ -1,14 +1,16 @@
 package com.example.springsoap;
 
 import javax.annotation.PostConstruct;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-
 import io.foodmenu.gt.webservice.*;
-
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -16,6 +18,7 @@ import org.springframework.util.Assert;
 @Component
 public class MealRepository {
     private static final Map<String, Meal> meals = new HashMap<String, Meal>();
+    private static final Map<String, Order> orders = new HashMap<String, Order>();
 
     @PostConstruct
     public void initData() {
@@ -49,6 +52,15 @@ public class MealRepository {
 
 
         meals.put(c.getName(), c);
+
+        Meal d = new Meal();
+        d.setName("Vegan Burger");
+        d.setDescription("Vegan Burger with fries");
+        d.setMealtype(Mealtype.VEGAN);
+        d.setKcal(800);
+        d.setPrice(10);
+
+        meals.put(d.getName(), d);
     }
 
     public Meal findMeal(String name) {
@@ -77,24 +89,44 @@ public class MealRepository {
     }
 
 // create new order with meal and quantity
-    public Order createOrder(Meal meal, int quantity) {
+    public Order createOrder(Meal meal, int quantity, XMLGregorianCalendar orderDate, String customerName, String address) {
         Assert.notNull(meal, "The meal must not be null");
         Order order = new Order();
+        // generate a random and unique order id
+        order.setId(java.util.UUID.randomUUID().toString());
         order.setMeal(meal);
         order.setQuantity(quantity);
+        order.setOrderDate(orderDate);
+        order.setCustomer(customerName);
+        order.setAddress(address);
         return order;
     }
 
     // add order
     public OrderConfirmation addOrder(Order order) {
         Assert.notNull(order, "The order must not be null");
-        meals.put(order.getMeal().getName(), order.getMeal());
-        // create a order confirmation
+        // add order to orders map and return confirmation if successful based on return value
+        // the return value is the previous value associated with the key, or null if there was no mapping for the key.
+        Order addedOrder = orders.put(order.getCustomer(), order);
         OrderConfirmation orderConfirmation = new OrderConfirmation();
-        orderConfirmation.setConfirmation("Order added successfully");
-
+        orderConfirmation.setOrder(order);
+        if (addedOrder == null) {
+            orderConfirmation.setConfirmation("Order added successfully");
+        } else {
+            orderConfirmation.setConfirmation("Order already exists");
+        }
         return orderConfirmation;
     }
 
+    // find order
+    public Order findOrder(String customerName) {
+        Assert.notNull(customerName, "The customer's name must not be null");
+        return orders.get(customerName);
+    }
+
+    // get all orders by converting the map to a list
+    public List<Order> getAllOrders() {
+        return new ArrayList<Order>(orders.values());
+    }
 
 }

@@ -52,11 +52,29 @@ public class MenuEndpoint {
     @ResponsePayload
     public AddOrderResponse addOrder(@RequestPayload AddOrderRequest request) {
         AddOrderResponse response = new AddOrderResponse();
-        response.setOrderConfirmation(mealrepo.addOrder(mealrepo.createOrder(mealrepo.findMeal(request.getName()), request.getQuantity())));        
+        response.setOrderConfirmation(mealrepo.addOrder(mealrepo.createOrder(mealrepo.findMeal(request.getMealName()), request.getQuantity(), request.getOrderDate(), request.getCustomer(), request.getAddress())));       
+        return response;
+    }
+    
+    // getorder meal
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getOrderRequest")
+    @ResponsePayload
+    public GetOrderResponse getOrder(@RequestPayload GetOrderRequest request) {
+        GetOrderResponse response = new GetOrderResponse();
+        response.setOrder(mealrepo.findOrder(request.getCustomer()));
+
         return response;
     }
 
-    
+    // getAllOrders
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllOrdersRequest")
+    @ResponsePayload
+    public GetAllOrdersResponse getAllOrders(@RequestPayload GetAllOrdersRequest request) {
+        GetAllOrdersResponse response = new GetAllOrdersResponse();
+        response.getOrders().addAll(mealrepo.getAllOrders());
+
+        return response;
+    }
 
 
 }

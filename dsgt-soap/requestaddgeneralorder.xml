@@ -1,0 +1,13 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:gs="http://foodmenu.io/gt/webservice">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <gs:addOrderRequest>
+            <gs:mealName>Steak</gs:mealName>
+            <gs:quantity>3</gs:quantity>
+            <gs:orderDate>2024-04-01T14:00:00</gs:orderDate>
+            <gs:customer>Bob Smith</gs:customer>
+            <gs:address>789 Main St, Springfield, IL 62701</gs:address>
+        </gs:addOrderRequest>
+    </soapenv:Body>
+</soapenv:Envelope>

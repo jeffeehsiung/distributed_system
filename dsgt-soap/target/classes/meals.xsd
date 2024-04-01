@@ -51,8 +51,11 @@
     <xs:element name="addOrderRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="name" type="xs:string"/>
+                <xs:element name="mealName" type="xs:string"/>
                 <xs:element name="quantity" type="xs:int"/>
+                <xs:element name="orderDate" type="xs:dateTime"/>
+                <xs:element name="customer" type="xs:string"/>
+                <xs:element name="address" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -66,6 +69,40 @@
         </xs:complexType>
     </xs:element>
 
+
+    <!-- Request and Respoonse for getOrder -->
+    <xs:element name="getOrderRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="customer" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getOrderResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="order" type="tns:order"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Request and Response for getAllOrders -->
+    <xs:element name="getAllOrdersRequest">
+        <xs:complexType>
+            <xs:sequence></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getAllOrdersResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="orders" type="tns:order" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- meal -->
     <xs:complexType name="meal">
         <xs:sequence>
             <xs:element name="name" type="xs:string"/>
@@ -85,11 +122,16 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <!-- order -->
+
     <xs:complexType name="order">
         <xs:sequence>
             <xs:element name="id" type="xs:string"/>
             <xs:element name="meal" type="tns:meal"/>
             <xs:element name="quantity" type="xs:int"/>
+            <xs:element name="orderDate" type="xs:dateTime"/>
+            <xs:element name="customer" type="xs:string"/>
+            <xs:element name="address" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
